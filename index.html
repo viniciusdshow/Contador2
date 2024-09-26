@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Dias</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+        }
+        .contador {
+            font-size: 2rem;
+            margin: 10px;
+        }
+        button, input {
+            padding: 10px 20px;
+            font-size: 1rem;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Contador de Dias</h1>
+        <div class="contador">
+            Dias sem reset: <span id="daysCounter">0</span>
+        </div>
+        <div class="contador">
+            Recorde de dias: <span id="recordCounter">0</span>
+        </div>
+        <input type="date" id="startDateInput">
+        <button id="setStartDateButton">Definir Data Inicial</button>
+        <button id="resetButton">Reset</button>
+        <button id="resetRecordButton">Reiniciar Recorde</button>
+    </div>
+
+    <script>
+        let startDate = localStorage.getItem('startDate');
+        let record = localStorage.getItem('record') || 0;
+
+        const daysCounter = document.getElementById('daysCounter');
+        const recordCounter = document.getElementById('recordCounter');
+        const resetButton = document.getElementById('resetButton');
+        const resetRecordButton = document.getElementById('resetRecordButton');
+        const startDateInput = document.getElementById('startDateInput');
+        const setStartDateButton = document.getElementById('setStartDateButton');
+
+        // Função que atualiza o contador de dias
+        function updateDaysCounter() {
+            const now = new Date();
+            const elapsedDays = Math.floor((now - new Date(startDate)) / (1000 * 60 * 60 * 24));
+            daysCounter.textContent = elapsedDays;
+        }
+
+        // Função que reseta o contador e atualiza o recorde
+        function resetCounter() {
+            const now = new Date();
+            const elapsedDays = Math.floor((now - new Date(startDate)) / (1000 * 60 * 60 * 24));
+
+            if (elapsedDays > record) {
+                record = elapsedDays;
+                localStorage.setItem('record', record);
+            }
+
+            recordCounter.textContent = record;
+
+            startDate = new Date();
+            localStorage.setItem('startDate', startDate);
+            updateDaysCounter();
+        }
+
+        // Função para definir uma nova data de início
+        function setStartDate() {
+            const selectedDate = new Date(startDateInput.value);
+            if (!isNaN(selectedDate)) {
+                startDate = selectedDate;
+                localStorage.setItem('startDate', startDate);
+                updateDaysCounter();
+            }
+        }
+
+        // Função para reiniciar o recorde
+        function resetRecord() {
+            record = 0;
+            localStorage.setItem('record', record);
+            recordCounter.textContent = record;
+        }
+
+        // Inicialização
+        if (!startDate) {
+            startDate = new Date();
+            localStorage.setItem('startDate', startDate);
+        }
+
+        recordCounter.textContent = record;
+
+        // Atualiza o contador a cada segundo
+        setInterval(updateDaysCounter, 1000);
+
+        // Resetar o contador
+        resetButton.addEventListener('click', resetCounter);
+
+        // Definir nova data de início
+        setStartDateButton.addEventListener('click', setStartDate);
+
+        // Reiniciar recorde
+        resetRecordButton.addEventListener('click', resetRecord);
+    </script>
+</body>
+</html>
